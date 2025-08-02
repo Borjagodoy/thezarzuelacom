@@ -1,0 +1,74 @@
+---
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+---
+<div id="search-overlay" class="relative z-20">
+  <!-- Capa oscura con blur -->
+  <div id="overlay-bg" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 hidden"></div>
+
+  <!-- Buscador con ancho fijo -->
+  <div class="relative z-20 w-full max-w-2xl mx-auto px-4" id="search-wrapper">
+    <input
+        type="text"
+        id="search"
+        placeholder="Buscar zarzuela..."
+        class="w-full text-lg font-serif tracking-wide text-blue-700 bg-transparent border-0 border-b border-[#d8caa6] focus:border-blue-500 focus:outline-none focus:ring-0 placeholder-gray-400 transition-all duration-300"
+    />
+    <ul id="results" class="absolute top-full left-0 w-full  mt-2 z-30  space-y-2 p-3 hidden"></ul>
+  </div>
+
+  <script type="module">
+    const input = document.getElementById('search');
+    const results = document.getElementById('results');
+    const overlay = document.getElementById('overlay-bg');
+
+    function toggleOverlay(show) {
+      overlay.classList.toggle('hidden', !show);
+      results.classList.toggle('hidden', !show);
+    }
+
+    async function searchZarzuelas(query) {
+      if (!query.trim()) {
+        toggleOverlay(false);
+        results.innerHTML = "";
+        return;
+      }
+
+      const res = await fetch(`${apiUrl}/zarzuelas?filters[Title][$containsi]=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      if (data.data.length === 0) {
+        results.innerHTML = `<li class="text-gray-500 text-sm px-3 py-2">No se encontraron resultados</li>`;
+      } else {
+        results.innerHTML = data.data.map(item => `
+        <li class="group transition-all duration-200 cursor-pointer px-5 py-4 bg-white/60 backdrop-blur-sm shadow-md hover:shadow-lg hover:bg-white/80 text-left">
+            <a href="/zarzuela/${item.Title.replace(" ", '-')}" class="block space-y-1">
+                <h3 class="text-lg font-serif font-semibold text-blue-900 group-hover:underline">${item.Title}</h3>
+                <p class="text-sm text-gray-600">
+                    🎼 ${item.Compositor}
+                </p>
+                <p class="text-sm text-gray-600">
+                    ✍️ ${item.Libretista ?? '—'}
+                </p>
+                <p class="text-sm text-gray-600">
+                    ${item.Argumento ?? '—'}
+                </p>
+            </a>
+        </li>
+        `).join('');
+      }
+
+      toggleOverlay(true);
+    }
+
+    input.addEventListener('input', (e) => {
+      searchZarzuelas(e.target.value);
+    });
+
+    overlay.addEventListener('click', () => {
+      toggleOverlay(false);
+      input.value = "";
+      results.innerHTML = "";
+    });
+  </script>
+</div>

@@ -1,0 +1,169 @@
+---
+import Layout from "../../layouts/Layout.astro";
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+
+export const prerender = false;
+
+const { id } = Astro.params;
+let data = null;
+if(id){
+  const res = await fetch(`/zarzuelas?filters[Title][$eq]=${id.replace(/-/g, ' ')}`);
+  const json = await res.json();
+  console.log(`API Response:`, json);
+  data = json.data[0];
+}
+---
+<Layout>
+     {data ? (
+  <>
+    <!-- 🟡 HERO -->
+    <section class="w-full bg-[#fdfaf6] border-b border-[#e5dcc8] px-6 py-12 md:py-16 text-center relative">
+      <!-- 🔙 Breadcrumb -->
+      <div class="absolute top-4 left-4">
+        <a href="/" class="text-sm text-blue-600 hover:text-blue-800 hover:underline transition">
+          ← Volver al buscador
+        </a>
+      </div>
+
+      <div class="max-w-4xl mx-auto space-y-5">
+        <h1 class="text-5xl md:text-6xl font-serif font-bold text-blue-950">{data.Title}</h1>
+
+        {data.Genero && (
+          <p class="text-md md:text-lg italic text-[#5e4f30] tracking-wide uppercase">{data.Genero}</p>
+        )}
+
+        <div class="text-gray-700 text-base md:text-lg font-light space-y-1">
+          {data.Estreno && (
+            <p><span class="font-medium text-blue-900">{data.Estreno}</span> — Fecha de estreno</p>
+          )}
+          <p><span class="text-blue-900 font-medium">Compositor:</span> <span class="italic">{data.Compositor}</span></p>
+          {data.Libretista && (
+            <p><span class="text-blue-900 font-medium">Libretista:</span> <span class="italic">{data.Libretista}</span></p>
+          )}
+        </div>
+
+        {data.Argumento && (
+          <div class="pt-6">
+            <p class="text-base md:text-lg text-gray-700 font-serif max-w-3xl mx-auto leading-relaxed whitespace-pre-wrap">
+              {data.Argumento}
+            </p>
+          </div>
+        )}
+
+        <!-- 🎧 ENLACES MULTIMEDIA -->
+        <div class="pt-8 flex flex-wrap justify-center gap-6 text-sm md:text-base text-blue-800 font-medium">
+          <a href="/media/partitura-zarzuela.pdf" target="_blank" class="flex items-center gap-2 hover:underline">
+            🎼 Descargar partitura (PDF)
+          </a>
+          <a href="/media/libreto-zarzuela.pdf" target="_blank" class="flex items-center gap-2 hover:underline">
+            📘 Leer libreto
+          </a>
+        </div>
+      </div>
+    </section>
+
+  <section class="mt-16 max-w-4xl mx-auto px-6 space-y-14 text-gray-800">
+  <!-- 📜 SINOPSIS Y CONTEXTO -->
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-4">Sinopsis y contexto</h2>
+    <p class="leading-relaxed font-light">
+      Aquí va el párrafo introductorio, contextualizando la obra en su época, estilo y temática.
+    </p>
+  </div>
+
+  <!-- 🎭 PERSONAJES PRINCIPALES -->
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-4">Personajes principales</h2>
+    <ul class="list-disc list-inside space-y-2">
+      <li><span class="font-semibold text-[#4a4a4a]">Julián:</span> joven y apasionado oficial de imprenta que representa el carácter madrileño castizo.</li>
+      <li><span class="font-semibold text-[#4a4a4a]">Susana:</span> coqueta modistilla, símbolo del alma femenina de Lavapiés.</li>
+      <!-- Añade más personajes -->
+    </ul>
+  </div>
+
+  <!-- 🎬 DESARROLLO Y FINAL -->
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-4">Desarrollo y final</h2>
+    <p class="leading-relaxed font-light whitespace-pre-wrap">
+      Aquí puedes narrar cuadro a cuadro o acto por acto, destacando giros, conflictos y resolución.
+    </p>
+  </div>
+
+  <!-- 🎶 MÚSICA Y TEMAS CLAVE -->
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-4">Música y temas clave</h2>
+    <p class="leading-relaxed font-light">
+      Comentario sobre estilo musical, formas empleadas (romanzas, dúos, concertantes), leitmotivs, temas castizos, elementos populares...
+    </p>
+  </div>
+</section>
+<section class="mt-16 max-w-4xl w-full px-6 space-y-8 text-gray-800">
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-4">Fragmentos destacados</h2>
+    <ul class="space-y-5">
+      <!-- 🔗 Fragmento 1 -->
+      <li class="border-l-4 border-[#cdbd91] pl-4">
+        <a href="/fragmento/preludio" class="text-lg font-serif font-semibold text-blue-950 hover:underline">
+          Preludio
+        </a>
+        <p class="text-sm text-gray-600">Instrumental que abre la obra y sitúa el ambiente sonoro del Madrid castizo.</p>
+      </li>
+
+      <!-- 🔗 Fragmento 2 -->
+      <li class="border-l-4 border-[#cdbd91] pl-4">
+        <a href="/fragmento/tambien-la-gente-del-pueblo" class="text-lg font-serif font-semibold text-blue-950 hover:underline">
+          “También la gente del pueblo” (aria de Julián)
+        </a>
+        <p class="text-sm text-gray-600">Monólogo melódico donde el protagonista muestra su orgullo y sensibilidad popular.</p>
+      </li>
+
+      <!-- 🔗 Fragmento 3 -->
+      <li class="border-l-4 border-[#cdbd91] pl-4">
+        <a href="/fragmento/manton-de-manila" class="text-lg font-serif font-semibold text-blue-950 hover:underline">
+          “¿Dónde vas con mantón de Manila?” (habanera concertante)
+        </a>
+        <p class="text-sm text-gray-600">Número colectivo donde los personajes principales y el coro dialogan con ritmo y picardía.</p>
+      </li>
+
+      <!-- 🔗 Fragmento 4 -->
+      <li class="border-l-4 border-[#cdbd91] pl-4">
+        <a href="/fragmento/morena-y-rubia" class="text-lg font-serif font-semibold text-blue-950 hover:underline">
+          “Una morena y una rubia” (cuplés de Don Hilarión)
+        </a>
+        <p class="text-sm text-gray-600">Fragmento cómico donde el personaje presume de sus conquistas con gracia y ternura.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+<section class="mt-20 max-w-5xl w-full mx-auto px-6 space-y-12 text-gray-800 mb-20">
+  <!-- 🎥 VIDEOS LADO A LADO -->
+  <div>
+    <h2 class="text-3xl font-serif font-bold text-blue-900 mb-6">Watch & Listen</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Video 1 -->
+      <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-md">
+        <iframe 
+          src="https://www.youtube.com/embed/VIDEO_ID1"
+          title="Producción de 1987 - Teatro Real"
+          allowfullscreen
+          class="w-full h-full">
+        </iframe>
+      </div>
+      <!-- Video 2 -->
+      <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-md">
+        <iframe 
+          src="https://player.vimeo.com/video/VIDEO_ID2"
+          title="Escena icónica - Segundo acto"
+          allowfullscreen
+          class="w-full h-full">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+  </>
+) : (
+  <p class="text-red-600 text-center text-xl font-medium">Zarzuela no encontrada.</p>
+)}
+
+</Layout>
